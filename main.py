@@ -19,7 +19,7 @@ if (sys.argv[1] in list_types) == False:
     
 load_dotenv()
 
-elementIdList = ["e91ae743-b77c-45a7-b5d6-3444e8c60f86", "e91ae743-b77c-45a7-b5d6-3444e8c60f86"]
+elementIdList = ["e91ae743-b77c-45a7-b5d6-3444e8c60f86"]
 
 # "8d0a3196-062d-4987-8ea0-90efddba53fc_anchor"
 
@@ -34,6 +34,7 @@ browser.get(base_location)
 current_location = browser.current_url
 
 def delay_click(element: any) -> None:
+      print('delay start')
       wait = WebDriverWait(browser, timeout=3)
       wait.until(lambda d : element.is_displayed())
       element.click()
