@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.firefox.options import Options
 
 list_types = ('ter', "oon", "mvk")
 
@@ -19,71 +20,71 @@ if (sys.argv[1] in list_types) == False:
     
 load_dotenv()
 
-elementIdList = ["e91ae743-b77c-45a7-b5d6-3444e8c60f86"]
-
-# "8d0a3196-062d-4987-8ea0-90efddba53fc_anchor"
-
 login = os.environ['login']
 password = os.environ['password']
+directory = os.environ['directory']
+print(directory)
+formIdList = ['loginEditor', 'passwordEditor']
+formInputs = [login, password]
 
-maxDelay = 30
-base_location = 'https://portal.fedsfm.ru/account/login'
-browser = webdriver.Firefox()
-browser.get(base_location)
+elementIdList = ["e91ae743-b77c-45a7-b5d6-3444e8c60f86"]
+
+url = 'https://portal.fedsfm.ru/account/login'
+
+
+options = Options()
+options.set_preference("browser.download.folderList", 2)
+options.set_preference("browser.download.manager.showWhenStarting", False)
+options.set_preference("browser.download.dir", directory)
+options.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/x-gzip")
+
+browser = webdriver.Firefox(options=options)
+browser.get(url)
 
 current_location = browser.current_url
 
-def delay_click(element: any) -> None:
-      print('delay start')
+def wait_to_be_displayed(element: any) -> None:
       wait = WebDriverWait(browser, timeout=3)
-      wait.until(lambda d : element.is_displayed())
-      element.click()
-     
+      wait.until(lambda d : element.is_displayed())    
 
 def clickByID(id: str) -> None:
    try:
       element =  browser.find_element(By.ID, id)
-      delay_click(element)   
+      wait_to_be_displayed(element)
+      element.click()   
    except:
       print(f'Element with id: {id} not found/')
 
-
-def delay(base_location: str, current_location: str) -> None : 
-     count = 0
-     while(base_location == current_location):
-         time.sleep(1)
-         current_location = browser.current_url
-         count += 1
-         if count == maxDelay:
-              print("maximum number of attempts reached")
-              break
-         if base_location != current_location:
-              base_location = current_location
-              break         
-
-
 def loginHandler() -> None:
    try:
-      loginInput = browser.find_element(By.ID, 'loginEditor')
-      passwordInput = browser.find_element(By.ID, 'passwordEditor')
-      loginInput.send_keys(login)
-      passwordInput.send_keys(password) 
-      loginButton = browser.find_element(By.ID, 'loginButton')
-      delay_click(loginButton)
+      for id in formIdList:
+          element = browser.find_element(By.ID, id)
+          wait_to_be_displayed(element)
+          element.send_keys(formInputs[formIdList.index(id)])
+      clickByID("loginButton")
    except: 
       print("login failed!")
       browser.close()
 
-def download() -> None:
-      downloadLink = browser.find_element(By.XPATH, '//a[@href="/SkedDownload/GetActiveSked?type=xml21"]')
-      delay_click(downloadLink)      
+def download(listType) -> None:
+      listHref = ''
+      print(listType)
+      if(listType == 'ter'):
+          listHref = "/SkedDownload/GetActiveSked?type=xml21"
+      if(listType == 'oon'):
+         listHref = "/XmlCatalogDownload/GetActiveOONRus"
+      if(listType == 'mvk'):
+         listHref = "/XmlCatalogDownload/GetActiveMvk"
+      downloadLink = browser.find_element(By.XPATH, f'//a[@href="{listHref}"]')
+      wait_to_be_displayed(downloadLink) 
+      downloadLink.click()   
 
 loginHandler()
+time.sleep(5)
+clickByID(elementIdList[0])
+time.sleep(5)
+download(sys.argv[1])
+time.sleep(10)
+browser.close()
 
-delay(base_location, current_location)
 
-for id in elementIdList: 
-   delay(base_location, current_location)
-   clickByID(id)
-
-download()
