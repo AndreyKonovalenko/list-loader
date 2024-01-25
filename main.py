@@ -9,15 +9,13 @@ from selenium.webdriver.support.wait import WebDriverWait
 
 from browser_module import browser
 
-url = 'https://portal.fedsfm.ru/account/login'
-
-
 list_types = ('ter', "oon", "mvk")
 
 load_dotenv()
 
 login = os.environ['login']
 password = os.environ['password']
+url = os.environ['url']
 formIdList = ['loginEditor', 'passwordEditor']
 formInputs = [login, password]
 elementIdList = ["e91ae743-b77c-45a7-b5d6-3444e8c60f86"]
