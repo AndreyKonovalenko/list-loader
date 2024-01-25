@@ -6,39 +6,21 @@ from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.firefox.options import Options
 
-list_types = ('ter', "oon", "mvk")
-
-if len(sys.argv) < 2:
-    print('provide argrument with list type')
-    exit()
-
-if (sys.argv[1] in list_types) == False:
-     print('Incorrect list type')
-     exit()
-    
-load_dotenv()
-
-login = os.environ['login']
-password = os.environ['password']
-directory = os.environ['directory']
-print(directory)
-formIdList = ['loginEditor', 'passwordEditor']
-formInputs = [login, password]
-
-elementIdList = ["e91ae743-b77c-45a7-b5d6-3444e8c60f86"]
+from browser_module import browser
 
 url = 'https://portal.fedsfm.ru/account/login'
 
 
-options = Options()
-options.set_preference("browser.download.folderList", 2)
-options.set_preference("browser.download.manager.showWhenStarting", False)
-options.set_preference("browser.download.dir", directory)
-options.set_preference("browser.helperApps.neverAsk.saveToDisk", "application/x-gzip")
+list_types = ('ter', "oon", "mvk")
 
-browser = webdriver.Firefox(options=options)
+load_dotenv()
+
+login = os.environ['login']
+password = os.environ['password']
+formIdList = ['loginEditor', 'passwordEditor']
+formInputs = [login, password]
+elementIdList = ["e91ae743-b77c-45a7-b5d6-3444e8c60f86"]
 browser.get(url)
 
 current_location = browser.current_url
@@ -78,6 +60,18 @@ def download(listType) -> None:
       downloadLink = browser.find_element(By.XPATH, f'//a[@href="{listHref}"]')
       wait_to_be_displayed(downloadLink) 
       downloadLink.click()   
+
+
+if len(sys.argv) < 2:
+    print('provide argrument with list type')
+    loginHandler()
+    exit()
+
+if (sys.argv[1] in list_types) == False:
+     print('Incorrect list type')
+     exit()
+    
+
 
 loginHandler()
 time.sleep(5)
