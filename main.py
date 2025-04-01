@@ -100,7 +100,7 @@ clickByID(elementIdList[0])
 time.sleep(5)
 download(sys.argv[1])
 time.sleep(10)
-browser.close()
+browser.quit()
 if (sys.argv[1] == 'ter'):
    unzipDownoladed()
    time.sleep(2)
